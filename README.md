@@ -1,413 +1,271 @@
-# Sistema de Envio de E-mails em Lote com Java, RabbitMQ e React
+# Sistema de Envio de E-mails em Lote com Java e RabbitMQ
 
-Este projeto foi desenvolvido como atividade acadêmica de mensageria, com base nos conceitos apresentados na documentação de arquitetura com RabbitMQ.
+## Sobre o projeto
 
-A proposta é demonstrar um sistema capaz de cadastrar destinatários, criar mensagens e realizar envio em lote de forma assíncrona utilizando RabbitMQ.
-
-O projeto possui:
-
-- Backend em Java com Spring Boot;
-- Frontend em React com TypeScript;
-- Banco de dados PostgreSQL;
-- Mensageria com RabbitMQ;
-- Docker Compose para subir os serviços externos.
-
-## Objetivo
-
-O objetivo do sistema é demonstrar, de forma prática, o uso de mensageria com RabbitMQ em uma aplicação Java.
-
-O fluxo principal é:
-
-```text
-Frontend React
-      ↓
-Backend Spring Boot
-      ↓
-Banco PostgreSQL
-      ↓
-Producer publica mensagem no RabbitMQ
-      ↓
-Exchange email.exchange
-      ↓
-Routing key email.enviar
-      ↓
-Fila fila.email
-      ↓
-Consumer processa a mensagem
-      ↓
-Status atualizado no banco
-```
-
-## Relação com a documentação
-
-A documentação utilizada como base apresenta uma arquitetura de mensageria confiável com RabbitMQ, abordando conceitos como:
-
-- Producer;
-- Consumer;
-- Exchange;
-- Queue;
-- Binding;
-- Routing Key;
-- Comunicação assíncrona;
-- Processamento desacoplado;
-- Confiabilidade no processamento de mensagens.
-
-Nesta entrega, foi implementada uma versão essencial e funcional desses conceitos, focada no serviço de envio de e-mails em lote.
-
-Recursos mais avançados, como retry, DLQ, idempotência e múltiplos microsserviços, foram considerados como possíveis evoluções futuras.
-
-## Funcionalidades
+Sistema backend desenvolvido em Java com Spring Boot para envio assíncrono de e-mails em lote utilizando RabbitMQ.
 
 O sistema permite:
 
-- Cadastrar destinatários;
-- Listar destinatários cadastrados;
-- Criar uma mensagem;
-- Solicitar envio em lote;
-- Publicar mensagens no RabbitMQ;
-- Consumir mensagens da fila;
-- Simular o envio de e-mails;
-- Atualizar o status do envio no banco;
-- Visualizar os envios pelo frontend;
-- Consultar evidências no PostgreSQL, RabbitMQ e logs do backend.
+* Cadastrar destinatários;
+* Listar destinatários;
+* Criar envios de e-mail;
+* Solicitar envio em lote;
+* Processar mensagens de forma assíncrona via RabbitMQ.
 
-## Tecnologias utilizadas
+O objetivo principal é demonstrar conceitos de mensageria, separando a requisição inicial do processamento do envio.
 
-## Backend
+---
 
-- Java
-- Spring Boot
-- Spring Web
-- Spring Data JPA
-- Bean Validation
-- RabbitMQ
-- PostgreSQL
-- Maven
+# Tecnologias utilizadas
 
-## Frontend
+* Java
+* Spring Boot
+* Spring Web
+* Spring Data JPA
+* Bean Validation
+* RabbitMQ
+* PostgreSQL
+* Docker / Docker Compose
+* Maven
+* Postman
 
-- React
-- TypeScript
-- Vite
-- CSS
-- Fetch API
+---
 
-## Infraestrutura
+# Arquitetura de mensageria
 
-- Docker
-- Docker Compose
-- Postman
-- RabbitMQ Management
+O sistema utiliza RabbitMQ com:
 
-## Estrutura do projeto
+* **Exchange:** `email.exchange`
+* **Fila:** `fila.email`
+* **Routing Key:** `email.enviar`
+
+Fluxo principal:
 
 ```text
-Trabalho-mensageria
-├── docker-compose.yml
-├── README.md
-├── email-rabbitmq
-│   ├── README.md
-│   ├── pom.xml
-│   └── src
-└── frontend-email
-    ├── README.md
-    ├── package.json
-    └── src
+POST /email/lote
+↓
+Mensagens publicadas no RabbitMQ
+↓
+Consumer processa a fila
+↓
+Status atualizado no PostgreSQL
 ```
 
-## Serviços Docker
+---
 
-O projeto utiliza Docker Compose para executar:
+# Funcionalidades
 
-- PostgreSQL;
-- RabbitMQ com painel de gerenciamento.
+* Cadastro de destinatários
+* Listagem de destinatários
+* Envio individual de e-mails
+* Envio em lote
+* Publicação de mensagens no RabbitMQ
+* Consumer com `@RabbitListener`
+* Atualização de status (`PENDENTE` → `ENVIADO`)
+* Persistência no PostgreSQL
 
-## Como executar o projeto
+---
 
-## 1. Subir PostgreSQL e RabbitMQ
+# Como executar o projeto
 
-Na raiz do projeto, execute:
+## 1. Subir os containers
 
 ```bash
 docker compose -p email-rabbit up -d
 ```
 
-Isso irá subir os containers do PostgreSQL e do RabbitMQ.
+---
 
 ## 2. Acessar o RabbitMQ
-
-Acesse no navegador:
 
 ```text
 http://localhost:15673
 ```
 
-Credenciais:
+Login:
 
 ```text
 Usuário: guest
 Senha: guest
 ```
 
+---
+
 ## 3. Executar o backend
 
-Entre na pasta do backend:
-
-```bash
-cd email-rabbitmq
-```
-
-Execute a aplicação pela IDE ou pela classe principal:
+Executar a classe:
 
 ```text
 EmailRabbitmqApplication.java
 ```
 
-O backend ficará disponível em:
+Aplicação disponível em:
 
 ```text
 http://localhost:8080
 ```
 
-## 4. Executar o frontend
+---
 
-Em outro terminal, entre na pasta do frontend:
+# Configuração do application.properties
 
-```bash
-cd frontend-email
+```properties
+spring.datasource.url=jdbc:postgresql://localhost:5433/email_db
+spring.datasource.username=email_user
+spring.datasource.password=email_pass
+
+spring.rabbitmq.host=localhost
+spring.rabbitmq.port=5673
+spring.rabbitmq.username=guest
+spring.rabbitmq.password=guest
 ```
 
-Instale as dependências:
+---
 
-```bash
-npm install
-```
-
-Execute o frontend:
-
-```bash
-npm run dev
-```
-
-O frontend ficará disponível em:
-
-```text
-http://localhost:5173
-```
-
-## Configuração do RabbitMQ
-
-A aplicação utiliza a seguinte configuração:
-
-```text
-Exchange: email.exchange
-Tipo: direct
-
-Fila: fila.email
-
-Routing key: email.enviar
-```
-
-Funcionamento:
-
-1. O backend cria um registro de envio no banco com status `PENDENTE`;
-2. O producer publica o ID do envio na exchange `email.exchange`;
-3. A exchange encaminha a mensagem para a fila `fila.email` usando a routing key `email.enviar`;
-4. O consumer escuta a fila;
-5. O consumer busca o envio no banco;
-6. O envio é simulado no console;
-7. O status é atualizado para `ENVIADO`.
-
-## Endpoints principais
+# Endpoints principais
 
 ## Destinatários
 
-Cadastrar destinatário:
+### Cadastrar
 
 ```http
-POST http://localhost:8080/destinatarios
+POST /destinatarios
 ```
 
-Exemplo:
-
-```json
-{
-  "nome": "João",
-  "email": "joao@email.com"
-}
-```
-
-Listar destinatários:
+### Listar
 
 ```http
-GET http://localhost:8080/destinatarios
+GET /destinatarios
 ```
+
+---
 
 ## E-mails
 
-Enviar e-mail individual:
+### Envio individual
 
 ```http
-POST http://localhost:8080/email
+POST /email
 ```
 
-Exemplo:
+### Envio em lote
+
+```http
+POST /email/lote
+```
+
+### Listar envios
+
+```http
+GET /email
+```
+
+### Buscar envio por ID
+
+```http
+GET /email/{id}
+```
+
+---
+
+# Exemplo de envio em lote
 
 ```json
 {
-  "destinatario": "teste@email.com",
-  "assunto": "Teste RabbitMQ",
-  "mensagem": "Mensagem enviada pelo Postman"
+  "assunto": "Comunicado",
+  "mensagem": "Nova campanha disponível."
 }
 ```
 
-Enviar e-mails em lote:
+O sistema:
 
-```http
-POST http://localhost:8080/email/lote
+1. Busca os destinatários;
+2. Cria registros com status `PENDENTE`;
+3. Publica mensagens no RabbitMQ;
+4. O consumer processa os envios;
+5. Atualiza o status para `ENVIADO`.
+
+---
+
+# Estrutura principal do projeto
+
+```text
+config/
+controller/
+dto/
+model/
+repository/
+service/
 ```
 
-Exemplo:
+Principais classes:
 
-```json
-{
-  "assunto": "Comunicado em Lote",
-  "mensagem": "Olá, temos uma nova mensagem para todos os destinatários cadastrados."
-}
-```
+* `RabbitMQConfig`
+* `EmailController`
+* `EmailService`
+* `EmailConsumer`
+* `DestinatarioService`
 
-Listar envios:
+---
 
-```http
-GET http://localhost:8080/email
-```
-
-Buscar envio por ID:
-
-```http
-GET http://localhost:8080/email/{id}
-```
-
-## Banco de dados
-
-O banco utilizado é o PostgreSQL.
-
-Para acessar o banco pelo terminal:
-
-```bash
-docker exec -it postgres-email psql -U email_user -d email_db
-```
-
-Listar tabelas:
-
-```sql
-\dt
-```
+# Banco de dados
 
 Tabelas principais:
 
-```text
-destinatarios
-email
+* `destinatarios`
+* `email`
+
+Status utilizados:
+
+* `PENDENTE`
+* `ENVIADO`
+
+---
+
+# Comandos úteis
+
+Subir containers:
+
+```bash
+docker compose -p email-rabbit up -d
 ```
 
-Consultar destinatários:
-
-```sql
-select * from destinatarios;
-```
-
-Consultar envios:
-
-```sql
-select * from email order by id;
-```
-
-## Evidência esperada
-
-Após cadastrar destinatários e solicitar envio em lote, a tabela `email` deve mostrar um registro para cada destinatário.
-
-Exemplo:
-
-```text
-id | assunto            | destinatario      | status  | data_envio
----+--------------------+-------------------+---------+----------------------------
-1  | Comunicado em Lote | joao@email.com    | ENVIADO | 2026-05-27 19:56:06.6211
-2  | Comunicado em Lote | maria@email.com   | ENVIADO | 2026-05-27 19:56:06.644772
-3  | Comunicado em Lote | carlos@email.com  | ENVIADO | 2026-05-27 19:56:06.656271
-```
-
-No RabbitMQ, a fila `fila.email` deve voltar para `Ready = 0` depois que o consumer processar as mensagens.
-
-## Frontend
-
-A interface permite:
-
-- Cadastrar destinatários;
-- Visualizar destinatários cadastrados;
-- Enviar mensagem em lote;
-- Visualizar envios realizados;
-- Ver status dos envios;
-- Expandir um envio para ver a mensagem enviada.
-
-A tela consome a API do backend em:
-
-```text
-http://localhost:8080
-```
-
-## Observação sobre o envio de e-mails
-
-Nesta versão acadêmica, o envio de e-mails é simulado no console pelo consumer.
-
-O objetivo principal é demonstrar o fluxo assíncrono com RabbitMQ, incluindo:
-
-- Producer;
-- Exchange;
-- Routing Key;
-- Queue;
-- Consumer;
-- Banco de dados;
-- Atualização de status.
-
-Em uma evolução futura, o consumer poderia ser integrado a um serviço real de envio de e-mails, como SMTP, Mailtrap, Ethereal Email, SendGrid ou outro provedor.
-
-## Limitações desta versão
-
-Esta versão foi mantida simples para atender ao escopo principal da atividade.
-
-Não foram implementados nesta etapa:
-
-- Retry automático;
-- Dead Letter Queue;
-- Idempotência;
-- Microsserviços separados;
-- Envio real por SMTP;
-- Autenticação de usuários.
-
-Esses pontos podem ser adicionados futuramente.
-
-## Como parar os containers
-
-Na raiz do projeto:
+Parar containers:
 
 ```bash
 docker compose -p email-rabbit down
 ```
 
-Para apagar também os dados dos volumes:
+Acessar PostgreSQL:
 
 ```bash
-docker compose -p email-rabbit down -v
+docker exec -it postgres-email psql -U email_user -d email_db
 ```
 
-## Integrantes
+---
 
-- Nome do integrante 1
-- Nome do integrante 2
-- Nome do integrante 3
-- Nome do integrante 4
+# Observações
 
-## Status do projeto
+Nesta versão acadêmica, o envio de e-mails é simulado no console pelo consumer.
 
-Projeto funcional para entrega acadêmica, demonstrando o uso de RabbitMQ com Java, Spring Boot, PostgreSQL e React.
+O foco do projeto é demonstrar:
+
+* Producer
+* Consumer
+* Exchange
+* Queue
+* Routing Key
+* Processamento assíncrono com RabbitMQ
+
+Recursos como DLQ, retry e integração com serviços reais de e-mail podem ser adicionados futuramente.
+
+---
+
+# Integrantes
+
+* Gabriel Kaynan
+* João Gabriel Borges
+* João Victor Fernandes
+* Sebastian Domingues
+
+
