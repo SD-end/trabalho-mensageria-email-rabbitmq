@@ -1,0 +1,44 @@
+# =========================
+# JAVA / SPRING BOOT / MAVEN
+# =========================
+
+target/
+out/
+*.class
+
+# Maven temporário
+.mvn/timing.properties
+
+# LOGS
+
+logs/
+*.log
+
+# VARIÁVEIS DE AMBIENTE
+.env
+.env.local
+
+# IDE / EDITORES
+
+.idea/
+*.iml
+
+.vscode/*
+!.vscode/extensions.json
+
+.classpath
+.project
+.settings/
+
+# SISTEMA OPERACIONAL
+
+.DS_Store
+Thumbs.db
+
+# ARQUIVOS TEMPORÁRIOS
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

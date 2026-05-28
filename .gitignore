@@ -1,0 +1,79 @@
+# =========================
+# BACKEND - Java / Spring Boot
+# =========================
+
+email-rabbitmq/target/
+email-rabbitmq/out/
+email-rabbitmq/*.class
+
+# Maven
+email-rabbitmq/.mvn/timing.properties
+
+# Logs
+*.log
+logs/
+
+# =========================
+# FRONTEND - React / Vite
+# =========================
+
+frontend-email/node_modules/
+frontend-email/dist/
+frontend-email/dist-ssr/
+frontend-email/.vite/
+frontend-email/.cache/
+
+# Logs do npm/yarn/pnpm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# VARIÁVEIS DE AMBIENTE
+# =========================
+
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+email-rabbitmq/.env
+frontend-email/.env
+frontend-email/.env.local
+frontend-email/.env.development.local
+frontend-email/.env.test.local
+frontend-email/.env.production.local
+
+# =========================
+# IDE / EDITORES
+# =========================
+
+.idea/
+*.iml
+
+.vscode/*
+!.vscode/extensions.json
+
+.classpath
+.project
+.settings/
+
+# =========================
+# SISTEMA OPERACIONAL
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# ARQUIVOS TEMPORÁRIOS
+# =========================
+
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

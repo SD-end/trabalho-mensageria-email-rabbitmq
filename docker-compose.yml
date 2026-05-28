@@ -1,0 +1,25 @@
+services:
+  postgres-email:
+    image: postgres:16
+    container_name: postgres-email
+    environment:
+      POSTGRES_DB: email_db
+      POSTGRES_USER: email_user
+      POSTGRES_PASSWORD: email_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_email_data:/var/lib/postgresql/data
+
+  rabbitmq-email:
+    image: rabbitmq:3-management
+    container_name: rabbitmq-email
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+volumes:
+  postgres_email_data:
